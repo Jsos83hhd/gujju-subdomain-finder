@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gujju Subdomain Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #output {
+            margin-top: 20px;
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gujju Subdomain Finder</h1>
+    <p>Enter a domain to find its subdomains:</p>
+    <input type="text" id="domain" placeholder="example.com">
+    <button onclick="findSubdomains()">Find Subdomains</button>
+    <div id="output" class="hidden">
+        <h3>Subdomains:</h3>
+        <pre id="subdomainsList"></pre>
+        <button onclick="downloadResults()">Download Results</button>
+    </div>
+
+    <script>
+        async function findSubdomains() {
+            const domain = document.getElementById('domain').value;
+            if (!domain) {
+                alert('Please enter a domain!');
+                return;
+            }
+
+            const outputDiv = document.getElementById('output');
+            const subdomainsList = document.getElementById('subdomainsList');
+            subdomainsList.textContent = 'Fetching subdomains...';
+
+            // Call the backend API to get subdomains
+            const response = await fetch(`/subdomains?domain=${domain}`);
+            if (response.ok) {
+                const data = await response.json();
+                subdomainsList.textContent = data.subdomains.join('\n');
+                outputDiv.classList.remove('hidden');
+            } else {
+                subdomainsList.textContent = 'Failed to fetch subdomains.';
+            }
+        }
+
+        function downloadResults() {
+            const text = document.getElementById('subdomainsList').textContent;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'subdomains.txt';
+            a.click();
+        }
+    </script>
+</body>
+</html>
